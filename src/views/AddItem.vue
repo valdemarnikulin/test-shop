@@ -143,10 +143,8 @@ export default {
         if (this.$v.form.$anyError) {
           return;
         }
-        await axios.post(baseURL, this.form)
-          .then(() => {
-            this.$router.push('/');
-          });
+        await axios.post(baseURL, this.form);
+        await this.$router.push('/');
       } catch (error) {
         console.log(error);
       }

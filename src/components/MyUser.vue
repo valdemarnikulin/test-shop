@@ -64,15 +64,14 @@ export default {
       this.$router.push('/addItem');
     },
     async  deleteItem(item) {
-      await axios
-        .delete(`${baseURL}/${item.id}`)
-        .then(() => {
-          this.$emit('deleteElement');
-          console.log('SUCCESS!!');
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      try {
+        await axios
+          .delete(`${baseURL}/${item.id}`);
+        await this.$emit('deleteElement');
+        console.log('SUCCESS!!');
+      } catch (error) {
+        console.log(error);
+      }
     },
   },
 };

@@ -25,6 +25,7 @@
         </div>
     </template>
 <b-table
+v-if="dataReady"
 :per-page="perPage"
 :current-page="currentPage"
 id="my-table"
@@ -63,13 +64,15 @@ export default {
   components: {
     MyUser,
   },
-  mounted() {
+  async mounted() {
+    await this.getAllData();
+    this.dataReady = true;
     console.log('mounted');
-    this.getAllData();
   },
   data() {
     return {
       showPopupInfo: false,
+      dataReady: false,
       items: [],
       fields: [
         'Users',
@@ -90,36 +93,34 @@ export default {
     closePopup() {
       this.showPopupInfo = false;
     },
-    getAllData() {
-      return new Promise((resolve) => {
-        axios.get(baseURL)
-          .then((res) => {
-            this.items = res.data;
-            resolve(res);
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-      });
+    async getAllData() {
+      try {
+        const res = await axios.get(baseURL);
+        this.items = res.data;
+      } catch (error) {
+        console.error(error);
+      }
     },
     async editItem(item) {
       await this.getCurrentTask(item);
       this.$router.push('/addItem');
     },
     async  deleteItem(item) {
-      await axios
-        .delete(`${baseURL}/${item.id}`)
-        .then(() => {
-          this.getAllData();
-          console.log('SUCCESS!!');
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      try {
+        await axios
+          .delete(`${baseURL}/${item.id}`);
+        await this.getAllData();
+      } catch (error) {
+        console.log(error);
+      }
     },
-    delItem() {
-      console.log('rerender');
-      this.getAllData();
+    async delItem() {
+      try {
+        console.log('rerender');
+        await this.getAllData();
+      } catch (error) {
+        console.error(error);
+      }
     },
     selection(item) {
       if (item.status === true) {
